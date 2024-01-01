@@ -3,6 +3,7 @@ import pygame_gui
 import sys
 import os
 from classes_modules import *
+from level_parser import parse_level
 
 GRAVITY = 15
 
@@ -73,10 +74,9 @@ if __name__ == '__main__':
     clock_delta = pygame.time.Clock()
     clock = pygame.time.Clock()
     manager = pygame_gui.UIManager(size)
-    land = Land(0, 550, 800, 600)
     background = pygame.transform.scale(load_image('fons/zaglushka.jpg'), (height, wight))
     main_window.blit(background, (0, 0))
-    player = Player(40, 40)
+    player, lands = parse_level('1')
     runnning = True
     up = 0
     while runnning:
@@ -94,7 +94,7 @@ if __name__ == '__main__':
                 )
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w or event.key == pygame.K_SPACE:
-                    if pygame.sprite.collide_mask(player, land):
+                    if any(pygame.sprite.collide_mask(player, land) for land in lands):
                         up = -GRAVITY * 2
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:
@@ -102,18 +102,18 @@ if __name__ == '__main__':
                     exit()
             manager.process_events(event)
         if collect[pygame.K_a]:
-            left = -10
+            left = -5
         else:
             left = 0
         if collect[pygame.K_s]:
-            down = 10
+            down = 5
         else:
             down = 0
         if collect[pygame.K_d]:
-            right = 10
+            right = 5
         else:
             right = 0
-        if not pygame.sprite.collide_mask(player, land):
+        if not any(pygame.sprite.collide_mask(player, land) for land in lands):
             player.rect.y += GRAVITY
         player.rect.x += left + right
         player.rect.y += up + down
@@ -124,5 +124,4 @@ if __name__ == '__main__':
         all_sprites.draw(main_window)
         manager.draw_ui(main_window)
         pygame.display.update()
-        clock.tick(20)
-
+        clock.tick(40)
