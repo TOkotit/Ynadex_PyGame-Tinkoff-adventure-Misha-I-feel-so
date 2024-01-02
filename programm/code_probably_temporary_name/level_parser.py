@@ -1,5 +1,5 @@
 from pathlib import Path
-from classes_modules import Player, Land
+from classes_modules import *
 
 
 def parse_level(filename: str):
@@ -10,11 +10,13 @@ def parse_level(filename: str):
     with open(path, encoding='utf-8') as f:
         for line in f.readlines():
             line = line.strip().split()
-            type, data = line[0], [int(i) for i in line[1:]]
+            type, data, image = line[0], [int(i) for i in line[1:-1]], line[-1]
             if type == '.':
-                player = Player(*data)
+                player = Player(image, *data)
             elif type == '_':
-                level_objects.append(Land(*data))
+                level_objects.append(Land(image, *data))
+            elif type == '|':
+                level_objects.append(Wall(image, *data))
 
     if player is None:
         raise Exception('не нашел игрока на уровне')

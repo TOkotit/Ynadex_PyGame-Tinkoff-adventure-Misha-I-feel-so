@@ -1,0 +1,4 @@
+. 150 400 lico.jpg
+| 1160 0 40 600 stone_wall.jpg
+| 0 0 40 600 stone_wall.jpg
+_ 0 560 1200 40 grass.png
