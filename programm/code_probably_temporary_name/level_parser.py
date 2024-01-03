@@ -17,8 +17,10 @@ def parse_level(filename: str):
                 level_objects.append(Land(image, *data))
             elif type == '|':
                 level_objects.append(Wall(image, *data))
+            elif type == '#':
+                level_fon = image
 
     if player is None:
         raise Exception('не нашел игрока на уровне')
 
-    return player, level_objects
+    return player, level_fon, level_objects

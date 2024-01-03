@@ -28,8 +28,8 @@ class Land(pygame.sprite.Sprite):
     def __init__(self, image, x1, y1, dlinna, vysota):
         super().__init__(all_sprites)
         self.rect = pygame.Rect(x1, y1, dlinna, vysota)
-        land_image = pygame.transform.scale(load_image(f'fons/{image}'), self.rect.size)
-        self.image = land_image
+        wall_image = pygame.transform.scale(load_image(f'fons/{image}'), self.rect.size)
+        self.image = wall_image
         self.mask = pygame.mask.from_surface(self.image)
 
 

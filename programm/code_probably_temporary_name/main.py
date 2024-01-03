@@ -74,20 +74,22 @@ if __name__ == '__main__':
     clock_delta = pygame.time.Clock()
     clock = pygame.time.Clock()
 
+    gravity_flag = True
+
     manager = pygame_gui.UIManager(size)
 
-    background = pygame.transform.scale(load_image('fons/zaglushka.jpg'), (wight, height))
-    main_window.blit(background, (0, 0))
+    player, level_fon, objects = parse_level('1st_level')
 
-    player, objects = parse_level('1st_level')
+    background = pygame.transform.scale(load_image(f'fons/{level_fon}'), (wight, height))
+    fon_x, fon_y = 0, -30
 
-    pa = pygame.transform.scale(load_image('pa.jpg'), (150, 100))
     camera_rect = pygame.Rect((300 - 75, 0), (150, 600))
-    camera_mask = pygame.mask.from_surface(pa)
     runnning = True
     up = 0
     while runnning:
-
+        main_window.blit(background, (fon_x, fon_y))
+        main_window.blit(background, (fon_x + 600, fon_y))
+        main_window.blit(background, (fon_x - 600, fon_y))
         collect = pygame.key.get_pressed()
         time_delta = clock_delta.tick(60) / 1000
         for event in pygame.event.get():
@@ -103,7 +105,9 @@ if __name__ == '__main__':
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w or event.key == pygame.K_SPACE:
-                    if any(pygame.sprite.collide_mask(player, land) for land in objects):
+                    if any(player.mask.overlap(land.mask,
+                                               (land.rect.x - player.rect.x, land.rect.y - player.rect.y - 2)) for
+                           land in objects):
                         up = -GRAVITY * 2
 
             if event.type == pygame.USEREVENT:
@@ -120,34 +124,58 @@ if __name__ == '__main__':
             right = 10
         else:
             right = 0
+
         player.rect.x += left + right
+        player.rect.y += up
+
         if objects:
             for object_ in objects:
                 if isinstance(object_, Wall):
-                    if pygame.sprite.collide_mask(player, object_):
+                    if player.mask.overlap(object_.mask, (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y)):
                         player.rect.x -= left + right
+                elif isinstance(object_, Land):
+                    if player.mask.overlap(object_.mask, (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y)):
+                        if player.rect.y + player.rect.height > object_.rect.y:
+                            player.rect.x -= left + right
+                        if object_.rect.y <= player.rect.y <= object_.rect.y + object_.rect.height:
+                            print(object_.rect.y + object_.rect.height, player.rect.y)
+                            player.rect.y = object_.rect.y + object_.rect.height
+                            gravity_flag = False
+                            up = 0
+        if not any(
+                player.mask.overlap(land.mask, (land.rect.x - player.rect.x, land.rect.y - player.rect.y - 1)) for
+                land in objects):
+            player.rect.y += GRAVITY
+            gravity_flag = True
+        else:
+            for i in objects:
+                if isinstance(i, Land) and gravity_flag:
+                    if player.mask.overlap(i.mask, (i.rect.x - player.rect.x, i.rect.y - player.rect.y + 1)):
+                        print('gravity_collision_detect')
+                        player.rect.y = i.rect.y - player.rect.height
 
         if player.rect.x + 1 <= camera_rect.x:
             player.rect.x = camera_rect.x
+            fon_x += 1
+            if fon_x >= 600:
+                fon_x = 0
             for object_ in objects:
                 object_.rect.x += 10
 
         elif player.rect.width + player.rect.x - 1 >= camera_rect.width + camera_rect.x:
             player.rect.x = camera_rect.x + camera_rect.width - player.rect.width
+            fon_x -= 1
+            if fon_x <= -600:
+                fon_x = 0
             for object_ in objects:
                 object_.rect.x -= 10
 
-        if not any(pygame.sprite.collide_mask(player, land) for land in objects):
-            player.rect.y += GRAVITY
 
-        player.rect.y += up
 
         if up < 0:
             up += 1
-        main_window.blit(background, (0, 0))
         manager.update(time_delta)
         all_sprites.draw(main_window)
-        main_window.blit(pa, (camera_rect.x, camera_rect.y))
         manager.draw_ui(main_window)
         pygame.display.update()
         clock.tick(40)
