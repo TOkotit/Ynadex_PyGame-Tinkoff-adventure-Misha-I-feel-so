@@ -74,8 +74,6 @@ if __name__ == '__main__':
     clock_delta = pygame.time.Clock()
     clock = pygame.time.Clock()
 
-    gravity_flag = True
-
     manager = pygame_gui.UIManager(size)
 
     player, level_fon, objects = parse_level('1st_level')
@@ -87,6 +85,7 @@ if __name__ == '__main__':
     runnning = True
     up = 0
     while runnning:
+        print(player.rect.y + player.rect.height)
         main_window.blit(background, (fon_x, fon_y))
         main_window.blit(background, (fon_x + 600, fon_y))
         main_window.blit(background, (fon_x - 600, fon_y))
@@ -126,33 +125,31 @@ if __name__ == '__main__':
             right = 0
 
         player.rect.x += left + right
-        player.rect.y += up
-
         if objects:
             for object_ in objects:
                 if isinstance(object_, Wall):
-                    if player.mask.overlap(object_.mask, (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y)):
+                    if player.mask.overlap(object_.mask, (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y - 1)):
                         player.rect.x -= left + right
                 elif isinstance(object_, Land):
-                    if player.mask.overlap(object_.mask, (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y)):
+                    if player.mask.overlap(object_.mask, (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y - 2)):
                         if player.rect.y + player.rect.height > object_.rect.y:
                             player.rect.x -= left + right
+        player.rect.y += up
+        if objects:
+            for object_ in objects:
+                if isinstance(object_, Land):
+                    if player.mask.overlap(object_.mask, (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y - 2)):
                         if object_.rect.y <= player.rect.y <= object_.rect.y + object_.rect.height:
-                            print(object_.rect.y + object_.rect.height, player.rect.y)
                             player.rect.y = object_.rect.y + object_.rect.height
-                            gravity_flag = False
                             up = 0
-        if not any(
-                player.mask.overlap(land.mask, (land.rect.x - player.rect.x, land.rect.y - player.rect.y - 1)) for
-                land in objects):
-            player.rect.y += GRAVITY
-            gravity_flag = True
-        else:
-            for i in objects:
-                if isinstance(i, Land) and gravity_flag:
-                    if player.mask.overlap(i.mask, (i.rect.x - player.rect.x, i.rect.y - player.rect.y + 1)):
-                        print('gravity_collision_detect')
-                        player.rect.y = i.rect.y - player.rect.height
+                        elif player.rect.y + player.rect.height > object_.rect.y + 1:
+                            player.rect.y = object_.rect.y - player.rect.height
+
+
+                        break
+            else:
+                player.rect.y += GRAVITY
+
 
         if player.rect.x + 1 <= camera_rect.x:
             player.rect.x = camera_rect.x
