@@ -47,9 +47,15 @@ class Wall(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(load_image(f'fons/{image}'), self.rect.size)
         self.mask = pygame.mask.from_surface(self.image)
 
-# class Lever(pygame.sprite.Sprite):
-#     def __init__(self, image, x1, x2):
-#         pass
+class Lever(pygame.sprite.Sprite):
+    def __init__(self, image, x1, y1, dlinna, vysota):
+        super().__init__(all_sprites)
+        self.rect = pygame.Rect(x1, y1, dlinna, vysota)
+        self.image = pygame.transform.scale(load_image(f'objects/{image}'), self.rect.size)
+        self.mask = pygame.mask.from_surface(self.image)
+    def touch(self):
+        self.image = pygame.transform.flip(self.image, True, False)
+        
 
 
 

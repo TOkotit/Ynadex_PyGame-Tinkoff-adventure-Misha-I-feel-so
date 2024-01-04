@@ -62,6 +62,61 @@ def start_screen():
         pygame.display.update()
 
 
+def update_collision():
+    global left, right, up, flag_gravity
+    player.rect.x += left + right
+    if objects:
+        for object_ in objects:
+            if isinstance(object_, Wall):
+                if player.mask.overlap(object_.mask,
+                                       (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y - 1)):
+                    player.rect.x -= left + right
+            elif isinstance(object_, Land):
+                if player.mask.overlap(object_.mask,
+                                       (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y - 2)):
+                    if player.rect.y + player.rect.height > object_.rect.y:
+                        player.rect.x -= left + right
+    player.rect.y += up
+    if objects:
+        for object_ in objects:
+            if isinstance(object_, Land):
+                if player.mask.overlap(object_.mask,
+                                       (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y - 2)):
+                    if object_.rect.y <= player.rect.y <= object_.rect.y + object_.rect.height:
+                        player.rect.y = object_.rect.y + object_.rect.height
+                        up += 3.5
+                    elif player.rect.y + player.rect.height > object_.rect.y + 1:
+                        player.rect.y = object_.rect.y - player.rect.height
+                        flag_gravity = False
+
+                    break
+        else:
+            player.rect.y += GRAVITY
+
+
+def object_update():
+    global fon_x, fon_y
+    if player.rect.x + 1 <= camera_rect.x:
+        player.rect.x = camera_rect.x
+        fon_x += 2
+        if fon_x >= 600:
+            fon_x = 0
+        for object_ in objects:
+            object_.rect.x += 10
+        for pl_objrect in player_objects:
+            pl_objrect.rect.x += 10
+
+    elif player.rect.width + player.rect.x - 1 >= camera_rect.width + camera_rect.x:
+        player.rect.x = camera_rect.x + camera_rect.width - player.rect.width
+        fon_x -= 2
+        if fon_x <= -600:
+            fon_x = 0
+        for object_ in objects:
+            object_.rect.x -= 10
+        for pl_objrect in player_objects:
+            pl_objrect.rect.x -= 10
+
+
 if __name__ == '__main__':
     pygame.init()
 
@@ -74,18 +129,21 @@ if __name__ == '__main__':
     clock_delta = pygame.time.Clock()
     clock = pygame.time.Clock()
 
+    flag_gravity = True
+
     manager = pygame_gui.UIManager(size)
 
-    player, level_fon, objects = parse_level('1st_level')
+    player, level_fon, objects, player_objects, music = parse_level('1st_level')
 
     background = pygame.transform.scale(load_image(f'fons/{level_fon}'), (wight, height))
     fon_x, fon_y = 0, -30
-
+    bg_sound = pygame.mixer.Sound(f'../assets/sounds/fon_music/{music}')
+    bg_sound.set_volume(0.2)
+    bg_sound.play()
     camera_rect = pygame.Rect((300 - 75, 0), (150, 600))
     runnning = True
     up = 0
     while runnning:
-        print(player.rect.y + player.rect.height)
         main_window.blit(background, (fon_x, fon_y))
         main_window.blit(background, (fon_x + 600, fon_y))
         main_window.blit(background, (fon_x - 600, fon_y))
@@ -108,6 +166,13 @@ if __name__ == '__main__':
                                                (land.rect.x - player.rect.x, land.rect.y - player.rect.y - 2)) for
                            land in objects):
                         up = -GRAVITY * 2
+                if event.key == pygame.K_RETURN:
+                    for i in player_objects:
+                        print('enter')
+                        if (player.rect.x + player.rect.width // 2 + 70 > i.rect.x and
+                                player.rect.x + player.rect.width // 2 - 70 < i.rect.x + i.rect.width):
+                            i.touch()
+                            break
 
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:
@@ -124,50 +189,9 @@ if __name__ == '__main__':
         else:
             right = 0
 
-        player.rect.x += left + right
-        if objects:
-            for object_ in objects:
-                if isinstance(object_, Wall):
-                    if player.mask.overlap(object_.mask, (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y - 1)):
-                        player.rect.x -= left + right
-                elif isinstance(object_, Land):
-                    if player.mask.overlap(object_.mask, (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y - 2)):
-                        if player.rect.y + player.rect.height > object_.rect.y:
-                            player.rect.x -= left + right
-        player.rect.y += up
-        if objects:
-            for object_ in objects:
-                if isinstance(object_, Land):
-                    if player.mask.overlap(object_.mask, (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y - 2)):
-                        if object_.rect.y <= player.rect.y <= object_.rect.y + object_.rect.height:
-                            player.rect.y = object_.rect.y + object_.rect.height
-                            up = 0
-                        elif player.rect.y + player.rect.height > object_.rect.y + 1:
-                            player.rect.y = object_.rect.y - player.rect.height
+        update_collision()
 
-
-                        break
-            else:
-                player.rect.y += GRAVITY
-
-
-        if player.rect.x + 1 <= camera_rect.x:
-            player.rect.x = camera_rect.x
-            fon_x += 1
-            if fon_x >= 600:
-                fon_x = 0
-            for object_ in objects:
-                object_.rect.x += 10
-
-        elif player.rect.width + player.rect.x - 1 >= camera_rect.width + camera_rect.x:
-            player.rect.x = camera_rect.x + camera_rect.width - player.rect.width
-            fon_x -= 1
-            if fon_x <= -600:
-                fon_x = 0
-            for object_ in objects:
-                object_.rect.x -= 10
-
-
+        object_update()
 
         if up < 0:
             up += 1
