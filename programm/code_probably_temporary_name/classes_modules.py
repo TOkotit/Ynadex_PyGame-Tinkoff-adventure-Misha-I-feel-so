@@ -47,16 +47,43 @@ class Wall(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(load_image(f'fons/{image}'), self.rect.size)
         self.mask = pygame.mask.from_surface(self.image)
 
+
 class Lever(pygame.sprite.Sprite):
-    def __init__(self, image, x1, y1, dlinna, vysota):
+    def __init__(self, image, x1, y1, dlinna, vysota, *condotions):
         super().__init__(all_sprites)
+        self.sound = pygame.mixer.Sound('../assets/sounds/lever_sound.mp3')
+        self.sound.set_volume(0.3)
+        self.conditions = condotions
         self.rect = pygame.Rect(x1, y1, dlinna, vysota)
         self.image = pygame.transform.scale(load_image(f'objects/{image}'), self.rect.size)
         self.mask = pygame.mask.from_surface(self.image)
-    def touch(self):
-        self.image = pygame.transform.flip(self.image, True, False)
-        
 
+    def touch(self):
+        self.sound.play()
+        self.image = pygame.transform.flip(self.image, True, False)
+
+    def switch(self, exit__):
+        for i in self.conditions:
+            exit__.conditions[i - 1] = not exit__.conditions[i - 1]
+
+
+class Exit(pygame.sprite.Sprite):
+    def __init__(self, image, x1, y1, dlinna, vysota, coond):
+        super().__init__(all_sprites)
+        self.conditions = [False for i in range(coond)]
+        self.exit_ = False
+        self.rect = pygame.Rect(x1, y1, dlinna, vysota)
+        self.image = pygame.transform.scale(load_image(f'objects/{image}'), self.rect.size)
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def all_conditions_compled(self):
+        if all(self.conditions):
+            self.exit_ = True
+
+    def player_exit(self, player):
+        if self.exit_:
+            if player.mask.oevlap(self, (self.rect.x - player.rect.x - 1, self.rect.y - player.rect.y - 1)):
+                level_compled = True
 
 
 horizontal_borders = pygame.sprite.Group()

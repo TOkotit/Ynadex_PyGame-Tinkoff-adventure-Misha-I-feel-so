@@ -14,7 +14,6 @@ def parse_level(filename: str):
                 level_fon = ' '.join(line.strip().split()[1:])
             elif line[0] == 'M':
                 bg_music = ' '.join(line.strip().split()[1:])
-
             else:
                 line = line.strip().split()
                 type, data, image = line[0], [int(i) for i in line[1:-1]], line[-1]
@@ -26,8 +25,10 @@ def parse_level(filename: str):
                     level_objects.append(Wall(image, *data))
                 elif type == '/':
                     player_objeccts.append(Lever(image, *data))
+                elif type == 'E':
+                    ex = Exit(image, *data)
 
     if player is None:
         raise Exception('не нашел игрока на уровне')
 
-    return player, level_fon, level_objects, player_objeccts, bg_music
+    return player, level_fon, level_objects, player_objeccts, bg_music, ex

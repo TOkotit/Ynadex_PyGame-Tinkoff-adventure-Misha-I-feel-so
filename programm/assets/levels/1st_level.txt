@@ -1,8 +1,9 @@
 M A Thousand Greetings.mp3
 # 1st_level_fon.jpg
-/ 100 410 50 50 lever.png
+/ 100 410 50 50 1 2 3 lever.png
+E 500 500 160 100 3 ex_who.png
 . 150 400 lico.jpg
-| 1160 0 40 600 stone_wall.png
-| 0 0 40 600 stone_wall.png
-_ 0 560 1200 40 grass.png
+| 1160 0 1000 600 stone_wall.png
+| -1000 0 1040 600 stone_wall.png
+_ -1000 560 2500 40 grass.png
 _ 60 460 250 30 stone_wall.png

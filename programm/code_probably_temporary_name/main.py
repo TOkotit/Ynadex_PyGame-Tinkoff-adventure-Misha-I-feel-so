@@ -61,6 +61,52 @@ def start_screen():
         manager.draw_ui(menu_surface)
         pygame.display.update()
 
+def end_screen():
+    pygame.display.set_caption('Start menu')
+    size = wight, height = 800, 600
+    menu_surface = pygame.display.set_mode(size)
+    manager = pygame_gui.UIManager(size)
+    intro_text = ["Конец",
+                  "игры про",
+                  "Олега Тинькофф", ]
+    font = pygame.font.Font(None, 30)
+    fon = pygame.transform.scale(load_image('fons/menu_fon.jpg'), (wight, height))
+    menu_surface.blit(fon, (0, 0))
+    run = True
+    start_button = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect((100, 400), (100, 50)),
+        text='exit',
+        manager=manager
+    )
+    clock1 = pygame.time.Clock()
+
+    while run:
+        time_delta1 = clock1.tick(60)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+            if event.type == pygame.USEREVENT:
+                if event.user_type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:
+                    pygame.quit()
+                if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
+                    if event.ui_element == start_button:
+                        start_button.hide()
+                        exit()
+            manager.process_events(event)
+        manager.update(time_delta1)
+        menu_surface.blit(fon, (0, 0))
+        text_coord = 100
+        for line in intro_text:
+            string_rendered = font.render(line, 1, pygame.Color('black'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 60 - len(line) * 4
+            text_coord += intro_rect.height
+            menu_surface.blit(string_rendered, intro_rect)
+        manager.draw_ui(menu_surface)
+        pygame.display.update()
 
 def update_collision():
     global left, right, up, flag_gravity
@@ -76,6 +122,9 @@ def update_collision():
                                        (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y - 2)):
                     if player.rect.y + player.rect.height > object_.rect.y:
                         player.rect.x -= left + right
+    if player.mask.overlap(exit_.mask, (exit_.rect.x - player.rect.x, exit_.rect.y - player.rect.y - 2)):
+        if all(exit_.conditions):
+            end_screen()
     player.rect.y += up
     if objects:
         for object_ in objects:
@@ -88,14 +137,13 @@ def update_collision():
                     elif player.rect.y + player.rect.height > object_.rect.y + 1:
                         player.rect.y = object_.rect.y - player.rect.height
                         flag_gravity = False
-
                     break
         else:
             player.rect.y += GRAVITY
 
 
 def object_update():
-    global fon_x, fon_y
+    global fon_x, fon_y, exit_
     if player.rect.x + 1 <= camera_rect.x:
         player.rect.x = camera_rect.x
         fon_x += 2
@@ -105,6 +153,7 @@ def object_update():
             object_.rect.x += 10
         for pl_objrect in player_objects:
             pl_objrect.rect.x += 10
+        exit_.rect.x += 10
 
     elif player.rect.width + player.rect.x - 1 >= camera_rect.width + camera_rect.x:
         player.rect.x = camera_rect.x + camera_rect.width - player.rect.width
@@ -115,6 +164,7 @@ def object_update():
             object_.rect.x -= 10
         for pl_objrect in player_objects:
             pl_objrect.rect.x -= 10
+        exit_.rect.x -= 10
 
 
 if __name__ == '__main__':
@@ -133,7 +183,7 @@ if __name__ == '__main__':
 
     manager = pygame_gui.UIManager(size)
 
-    player, level_fon, objects, player_objects, music = parse_level('1st_level')
+    player, level_fon, objects, player_objects, music, exit_ = parse_level('1st_level')
 
     background = pygame.transform.scale(load_image(f'fons/{level_fon}'), (wight, height))
     fon_x, fon_y = 0, -30
@@ -168,10 +218,13 @@ if __name__ == '__main__':
                         up = -GRAVITY * 2
                 if event.key == pygame.K_RETURN:
                     for i in player_objects:
-                        print('enter')
-                        if (player.rect.x + player.rect.width // 2 + 70 > i.rect.x and
-                                player.rect.x + player.rect.width // 2 - 70 < i.rect.x + i.rect.width):
+                        if ((player.rect.x + player.rect.width // 2 + 70 > i.rect.x) and
+                                (player.rect.x + player.rect.width // 2 - 70 < i.rect.x + i.rect.width) and
+                                (player.rect.y + player.rect.height // 2 > i.rect.y) and
+                                (player.rect.y + player.rect.height // 2 < i.rect.y + i.rect.height)):
                             i.touch()
+                            i.switch(exit_)
+
                             break
 
             if event.type == pygame.USEREVENT:
