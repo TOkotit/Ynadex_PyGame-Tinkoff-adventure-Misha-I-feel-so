@@ -80,11 +80,16 @@ class Exit(pygame.sprite.Sprite):
         if all(self.conditions):
             self.exit_ = True
 
-    def player_exit(self, player):
-        if self.exit_:
-            if player.mask.oevlap(self, (self.rect.x - player.rect.x - 1, self.rect.y - player.rect.y - 1)):
-                level_compled = True
 
+class Indicator:
+    def __init__(self, surface, ex):
+        self.coonds = ex.conditions
+        self.screen = surface
+        self.color = {True: 'green', False: 'red'}
+    def draw_circles(self):
+        x = 42
+        for i in range(len(self.coonds)):
+            pygame.draw.circle(self.screen, pygame.Color(self.color[self.coonds[i]]), (x * (i + 1), 30), 20)
 
 horizontal_borders = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()

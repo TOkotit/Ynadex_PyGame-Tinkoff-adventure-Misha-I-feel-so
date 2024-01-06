@@ -184,7 +184,7 @@ if __name__ == '__main__':
     manager = pygame_gui.UIManager(size)
 
     player, level_fon, objects, player_objects, music, exit_ = parse_level('1st_level')
-
+    indic = Indicator(main_window, exit_)
     background = pygame.transform.scale(load_image(f'fons/{level_fon}'), (wight, height))
     fon_x, fon_y = 0, -30
     bg_sound = pygame.mixer.Sound(f'../assets/sounds/fon_music/{music}')
@@ -251,5 +251,6 @@ if __name__ == '__main__':
         manager.update(time_delta)
         all_sprites.draw(main_window)
         manager.draw_ui(main_window)
+        indic.draw_circles()
         pygame.display.update()
         clock.tick(40)
