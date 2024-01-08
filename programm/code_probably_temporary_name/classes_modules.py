@@ -28,14 +28,14 @@ class Land(pygame.sprite.Sprite):
     def __init__(self, image, x1, y1, dlinna, vysota):
         super().__init__(all_sprites)
         self.rect = pygame.Rect(x1, y1, dlinna, vysota)
-        self.image = pygame.transform.scale(load_image(f'fons/{image}'), self.rect.size)
+        self.image = pygame.transform.smoothscale(load_image(f'fons/{image}'), self.rect.size)
         self.mask = pygame.mask.from_surface(self.image)
 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, image, pos_x, pos_y):
         super().__init__(player_group, all_sprites)
-        self.image = pygame.transform.scale(load_image(f'objects/{image}'), (64, 64))
+        self.image = pygame.transform.smoothscale(load_image(f'objects/{image}'), (64, 64))
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect().move(pos_x, pos_y)
 
@@ -44,7 +44,7 @@ class Wall(pygame.sprite.Sprite):
     def __init__(self, image, x1, y1, dlinna, vysota):
         super().__init__(all_sprites)
         self.rect = pygame.Rect(x1, y1, dlinna, vysota)
-        self.image = pygame.transform.scale(load_image(f'fons/{image}'), self.rect.size)
+        self.image = pygame.transform.smoothscale(load_image(f'fons/{image}'), self.rect.size)
         self.mask = pygame.mask.from_surface(self.image)
 
 
@@ -55,7 +55,7 @@ class Lever(pygame.sprite.Sprite):
         self.sound.set_volume(0.3)
         self.conditions = condotions
         self.rect = pygame.Rect(x1, y1, dlinna, vysota)
-        self.image = pygame.transform.scale(load_image(f'objects/{image}'), self.rect.size)
+        self.image = pygame.transform.smoothscale(load_image(f'objects/{image}'), self.rect.size)
         self.mask = pygame.mask.from_surface(self.image)
 
     def touch(self):
@@ -73,7 +73,7 @@ class Exit(pygame.sprite.Sprite):
         self.conditions = [False for i in range(coond)]
         self.exit_ = False
         self.rect = pygame.Rect(x1, y1, dlinna, vysota)
-        self.image = pygame.transform.scale(load_image(f'objects/{image}'), self.rect.size)
+        self.image = pygame.transform.smoothscale(load_image(f'objects/{image}'), self.rect.size)
         self.mask = pygame.mask.from_surface(self.image)
 
     def all_conditions_compled(self):
