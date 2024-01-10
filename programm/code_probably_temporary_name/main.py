@@ -28,7 +28,6 @@ def start_screen():
 
     while run:
         time_delta1 = clock1.tick(60)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame_gui.windows.UIConfirmationDialog(
@@ -109,17 +108,30 @@ def end_screen():
         pygame.display.update()
 
 def update_collision():
-    global left, right, up, flag_gravity
-    player.rect.x += left + right
+    global left, right, up, flag_gravity, player_orientation
+    go = left + right
+    player.rect.x += go
+    if go != 0 and not flag_gravity:
+        player.update_run()
+    else:
+         player.update_idle()
+    if go > 0:
+        if player.orientation < 0:
+            player.image = pygame.transform.flip(player.image, True, False)
+            player.orientation = 1
+    elif go < 0:
+        if player.orientation > 0:
+            player.image = pygame.transform.flip(player.image, True, False)
+            player.orientation = -1
     if objects:
         for object_ in objects:
                 if player.mask.overlap(object_.mask,
                                        (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y)):
                     if isinstance(object_, Wall):
-                        player.rect.x -= left + right
+                        player.rect.x -= go
                     elif isinstance(object_, Land):
                         if player.rect.y + player.rect.height > object_.rect.y + 1:
-                            player.rect.x -= left + right
+                            player.rect.x -= go
     if (((exit_.rect.x + 40 <= player.rect.x <= exit_.rect.x + exit_.rect.width) and (exit_.rect.x <= player.rect.x + player.rect.width <= exit_.rect.x + exit_.rect.width - 40))
             and (exit_.rect.y < player.rect.y < exit_.rect.y + exit_.rect.height)):
         if all(exit_.conditions):
@@ -135,10 +147,12 @@ def update_collision():
                         up += 3.5
                     elif player.rect.y + player.rect.height > object_.rect.y + 1:
                         player.rect.y = object_.rect.y - player.rect.height
-                        flag_gravity = False
+                    flag_gravity = False
                     break
         else:
+            flag_gravity = True
             player.rect.y += GRAVITY
+            player.update_fall()
 
 
 def object_update():

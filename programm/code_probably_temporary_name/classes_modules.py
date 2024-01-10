@@ -35,9 +35,46 @@ class Land(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     def __init__(self, image, pos_x, pos_y):
         super().__init__(player_group, all_sprites)
-        self.image = pygame.transform.smoothscale(load_image(f'objects/{image}'), (64, 64))
+        self.idle_image = pygame.transform.smoothscale(load_image(f'objects/{image}'), (64, 64))
+        self.image = self.idle_image
+        self.orientation = 1
+        self.cur_frame = 0
+        self.run_frames = []
+        self.fall_frames = []
+        self.status = 'idle'
+        self.cut_sheet(load_image(f'objects/tinkoff_run.png'), 20, 1, self.run_frames)
+        self.cut_sheet(load_image(f'objects/tinkoff_fall_from_stratosphere.png'), 10, 1,self.fall_frames)
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect().move(pos_x, pos_y)
+    def cut_sheet(self, sheet, colums, rows, list_):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // colums,
+                                sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(colums):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                list_.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+
+    def update_run(self):
+        if self.status != 'run':
+            self.status = 'run'
+            self.cur_frame = 0
+        self.image = self.run_frames[self.cur_frame]
+        if self.orientation < 0:
+            self.image = pygame.transform.flip(self.image, True, False)
+        self.cur_frame = (self.cur_frame + 1) % len(self.run_frames)
+    def update_fall(self):
+        if self.status != 'fall':
+            self.status = 'fall'
+            self.cur_frame = 0
+        self.image = self.fall_frames[self.cur_frame]
+        if self.orientation < 0:
+            self.image = pygame.transform.flip(self.image, True, False)
+        self.cur_frame = (self.cur_frame + 1) % len(self.fall_frames)
+    def update_idle(self):
+        self.image = self.idle_image
+        if self.orientation < 0:
+            self.image = pygame.transform.flip(self.image, True, False)
 
 
 class Wall(pygame.sprite.Sprite):
