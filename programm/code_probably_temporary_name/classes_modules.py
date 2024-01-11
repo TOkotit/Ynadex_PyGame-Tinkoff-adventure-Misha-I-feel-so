@@ -43,9 +43,10 @@ class Player(pygame.sprite.Sprite):
         self.fall_frames = []
         self.status = 'idle'
         self.cut_sheet(load_image(f'objects/tinkoff_run.png'), 20, 1, self.run_frames)
-        self.cut_sheet(load_image(f'objects/tinkoff_fall_from_stratosphere.png'), 10, 1,self.fall_frames)
+        self.cut_sheet(load_image(f'objects/tinkoff_fall_from_stratosphere.png'), 10, 1, self.fall_frames)
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect().move(pos_x, pos_y)
+
     def cut_sheet(self, sheet, colums, rows, list_):
         self.rect = pygame.Rect(0, 0, sheet.get_width() // colums,
                                 sheet.get_height() // rows)
@@ -63,6 +64,7 @@ class Player(pygame.sprite.Sprite):
         if self.orientation < 0:
             self.image = pygame.transform.flip(self.image, True, False)
         self.cur_frame = (self.cur_frame + 1) % len(self.run_frames)
+
     def update_fall(self):
         if self.status != 'fall':
             self.status = 'fall'
@@ -71,6 +73,7 @@ class Player(pygame.sprite.Sprite):
         if self.orientation < 0:
             self.image = pygame.transform.flip(self.image, True, False)
         self.cur_frame = (self.cur_frame + 1) % len(self.fall_frames)
+
     def update_idle(self):
         self.image = self.idle_image
         if self.orientation < 0:
@@ -118,15 +121,31 @@ class Exit(pygame.sprite.Sprite):
             self.exit_ = True
 
 
+class Portal(pygame.sprite.Sprite):
+    def __init__(self, image, direction, my_id, who_id, x1, y1, ):
+        super().__init__(all_sprites)
+        self.my_id = my_id
+        self.who_id = who_id
+        self.direction = direction
+        self.rect = pygame.Rect(x1, y1, 64, 128)
+        self.image = pygame.transform.smoothscale(load_image(f'objects/{image}'), self.rect.size)
+        if self.direction == 'right':
+            self.image = pygame.transform.flip(self.image, True, False)
+        self.mask = pygame.mask.from_surface(self.image)
+
+
+
 class Indicator:
     def __init__(self, surface, ex):
         self.coonds = ex.conditions
         self.screen = surface
         self.color = {True: 'green', False: 'red'}
+
     def draw_circles(self):
         x = 42
         for i in range(len(self.coonds)):
             pygame.draw.circle(self.screen, pygame.Color(self.color[self.coonds[i]]), (x * (i + 1), 30), 20)
+
 
 horizontal_borders = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()

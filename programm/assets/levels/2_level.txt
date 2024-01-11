@@ -3,7 +3,8 @@ M Industrial random noise.mp3
 S 2nd_level_sky_fon.png
 / 780 270 50 50 1 2 7 lever.png
 / 1300 510 50 50 1 2 3 lever.png
-/ 230 10 50 50 2 5 lever.png
+P 200 432 right 2 1 portal_blue.png
+P 200 -68 right 1 2 portal_blue.png
 / 800 80 50 50 2 6 lever.png
 / 950 80 50 50 5 6 7 lever.png
 / 1100 80 50 50 1 4 5 lever.png
@@ -12,8 +13,8 @@ S 2nd_level_sky_fon.png
 / 200 510 50 50 2 lever.png
 E 960 400 160 200 7 test_exit.png
 . 0 560 tinkoff_idle.png
-| 1500 -500 250 1100 stone_wall.png
-| -100 -500 300 1100 stone_wall.png
+| 1500 -500 250 1100 eeeeeeeee_metal_rocck.jpg
+| -100 -500 300 1100 eeeeeeeee_metal_rocck.jpg
 _ -100 560 1900 400 eeeeeeeee_metal_rocck.jpg
 _ 450 420 150 40 eeeeeeeee_metal_rocck.jpg
 _ 730 320 150 40 eeeeeeeee_metal_rocck.jpg

@@ -2,7 +2,7 @@ import pygame
 import pygame_gui
 import sys
 from classes_modules import *
-from level_parser import parse_level
+from level_parser import parse_level, portals
 
 GRAVITY = 15
 
@@ -60,6 +60,7 @@ def start_screen():
         manager.draw_ui(menu_surface)
         pygame.display.update()
 
+
 def end_screen():
     pygame.display.set_caption('Start menu')
     size = wight, height = 800, 600
@@ -107,14 +108,15 @@ def end_screen():
         manager.draw_ui(menu_surface)
         pygame.display.update()
 
+
 def update_collision():
-    global left, right, up, flag_gravity, player_orientation, runnning
+    global left, right, up, flag_gravity, runnning, fon_y, fon_x
     go = left + right
     player.rect.x += go
     if go != 0 and not flag_gravity:
         player.update_run()
     else:
-         player.update_idle()
+        player.update_idle()
     if go > 0:
         if player.orientation < 0:
             player.image = pygame.transform.flip(player.image, True, False)
@@ -125,14 +127,32 @@ def update_collision():
             player.orientation = -1
     if objects:
         for object_ in objects:
-                if player.mask.overlap(object_.mask,
-                                       (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y)):
-                    if isinstance(object_, Wall):
+            if player.mask.overlap(object_.mask,
+                                   (object_.rect.x - player.rect.x, object_.rect.y - player.rect.y)):
+                if isinstance(object_, Wall):
+                    player.rect.x -= go
+                elif isinstance(object_, Land):
+                    if player.rect.y + player.rect.height > object_.rect.y + 1:
                         player.rect.x -= go
-                    elif isinstance(object_, Land):
-                        if player.rect.y + player.rect.height > object_.rect.y + 1:
-                            player.rect.x -= go
-    if (((exit_.rect.x + 40 <= player.rect.x <= exit_.rect.x + exit_.rect.width) and (exit_.rect.x <= player.rect.x + player.rect.width <= exit_.rect.x + exit_.rect.width - 40))
+                elif isinstance(object_, Portal):
+                    for port in objects:
+                        if isinstance(port, Portal):
+                            if object_.who_id == port.my_id:
+                                if port.direction == 'right':
+                                    x_dir = 20
+                                else:
+                                    x_dir = -20
+                                x_p, y_p = player.rect.x - port.rect.x + x_dir, player.rect.y - port.rect.y
+                                for obj in objects:
+                                    obj.rect.x = obj.rect.x - x_p
+                                    obj.rect.y = obj.rect.y + y_p
+                                for obj in player_objects:
+                                    obj.rect.x = obj.rect.x - x_p
+                                    obj.rect.y = obj.rect.y + y_p
+                                fon_x, fon_y = fon_x + x_p, fon_y + y_p
+                                break
+    if (((exit_.rect.x + 40 <= player.rect.x <= exit_.rect.x + exit_.rect.width) and (
+            exit_.rect.x <= player.rect.x + player.rect.width <= exit_.rect.x + exit_.rect.width - 40))
             and (exit_.rect.y < player.rect.y < exit_.rect.y + exit_.rect.height)):
         if all(exit_.conditions):
             runnning = False
@@ -216,7 +236,6 @@ if __name__ == '__main__':
     flag_gravity = True
     manager = pygame_gui.UIManager(size)
     for level in range(1, 3):
-
         player, level_fon, level_sky, objects, player_objects, music, exit_ = parse_level(f'{level}_level')
         indic = Indicator(main_window, exit_)
         background = pygame.transform.smoothscale(load_image(f'fons/{level_fon}'), (wight, height))
@@ -267,7 +286,6 @@ if __name__ == '__main__':
                     if event.user_type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:
                         pygame.quit()
                         exit()
-
                 manager.process_events(event)
             if collect[pygame.K_a]:
                 left = -7
@@ -296,5 +314,4 @@ if __name__ == '__main__':
             all_sprites.remove(sprite)
         objects.clear()
         player_objects.clear()
-
-
+    end_screen()
