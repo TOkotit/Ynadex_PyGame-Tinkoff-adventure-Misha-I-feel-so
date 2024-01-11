@@ -12,6 +12,8 @@ def parse_level(filename: str):
         for line in f.readlines():
             if line[0] == '#':
                 level_fon = ' '.join(line.strip().split()[1:])
+            elif line[0] == 'S':
+                level_sky = ' '.join(line.strip().split()[1:])
             elif line[0] == 'M':
                 bg_music = ' '.join(line.strip().split()[1:])
             else:
@@ -31,4 +33,4 @@ def parse_level(filename: str):
     if player is None:
         raise Exception('не нашел игрока на уровне')
 
-    return player, level_fon, level_objects, player_objeccts, bg_music, ex
+    return player, level_fon, level_sky, level_objects, player_objeccts, bg_music, ex

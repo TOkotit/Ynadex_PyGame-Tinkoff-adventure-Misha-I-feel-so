@@ -108,7 +108,7 @@ def end_screen():
         pygame.display.update()
 
 def update_collision():
-    global left, right, up, flag_gravity, player_orientation
+    global left, right, up, flag_gravity, player_orientation, runnning
     go = left + right
     player.rect.x += go
     if go != 0 and not flag_gravity:
@@ -135,7 +135,7 @@ def update_collision():
     if (((exit_.rect.x + 40 <= player.rect.x <= exit_.rect.x + exit_.rect.width) and (exit_.rect.x <= player.rect.x + player.rect.width <= exit_.rect.x + exit_.rect.width - 40))
             and (exit_.rect.y < player.rect.y < exit_.rect.y + exit_.rect.height)):
         if all(exit_.conditions):
-            end_screen()
+            runnning = False
     player.rect.y += up
     if objects:
         for object_ in objects:
@@ -206,7 +206,6 @@ if __name__ == '__main__':
     pygame.init()
 
     start_screen()
-
     pygame.display.set_caption('Game')
     size = wight, height = 600, 600
     main_window = pygame.display.set_mode(size)
@@ -215,79 +214,87 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
 
     flag_gravity = True
-
     manager = pygame_gui.UIManager(size)
+    for level in range(1, 3):
 
-    player, level_fon, objects, player_objects, music, exit_ = parse_level('1st_level')
-    indic = Indicator(main_window, exit_)
-    background = pygame.transform.smoothscale(load_image(f'fons/{level_fon}'), (wight, height))
-    background2 = pygame.transform.smoothscale(load_image('fons/1st_level_fon_sky.jpg'), (5000, 3000))
-    fon_x, fon_y = 0, -30
-    bg_sound = pygame.mixer.Sound(f'../assets/sounds/fon_music/{music}')
-    bg_sound.set_volume(0.2)
-    bg_sound.play()
-    camera_rect = pygame.Rect((300 - 75, 300 - 40), (150, 80))
-    runnning = True
-    up = 0
-    while runnning:
-        main_window.blit(background, (fon_x, fon_y))
-        main_window.blit(background, (fon_x + 600, fon_y))
-        main_window.blit(background, (fon_x - 600, fon_y))
-        main_window.blit(background2, (-2500, fon_y - 3000))
-        collect = pygame.key.get_pressed()
-        time_delta = clock_delta.tick(60) / 1000
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                confor_dialog = pygame_gui.windows.UIConfirmationDialog(
-                    rect=pygame.Rect((150, 200), (300, 200)),
-                    manager=manager,
-                    window_title='Ало?',
-                    action_long_desc='Куда собрался?',
-                    action_short_name='Ок',
-                    blocking=True
-                )
+        player, level_fon, level_sky, objects, player_objects, music, exit_ = parse_level(f'{level}_level')
+        indic = Indicator(main_window, exit_)
+        background = pygame.transform.smoothscale(load_image(f'fons/{level_fon}'), (wight, height))
+        background2 = pygame.transform.smoothscale(load_image(f'fons/{level_sky}'), (5000, 3000))
+        fon_x, fon_y = 0, -30
+        bg_sound = pygame.mixer.Sound(f'../assets/sounds/fon_music/{music}')
+        bg_sound.set_volume(0.1)
+        bg_sound.play()
+        camera_rect = pygame.Rect((300 - 75, 300 - 40), (150, 80))
+        runnning = True
+        up = 0
+        while runnning:
+            main_window.blit(background, (fon_x, fon_y))
+            main_window.blit(background, (fon_x + 600, fon_y))
+            main_window.blit(background, (fon_x - 600, fon_y))
+            main_window.blit(background2, (-2500, fon_y - 3000))
+            collect = pygame.key.get_pressed()
+            time_delta = clock_delta.tick(60) / 1000
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    confor_dialog = pygame_gui.windows.UIConfirmationDialog(
+                        rect=pygame.Rect((150, 200), (300, 200)),
+                        manager=manager,
+                        window_title='Ало?',
+                        action_long_desc='Куда собрался?',
+                        action_short_name='Ок',
+                        blocking=True
+                    )
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w or event.key == pygame.K_SPACE:
-                    if any(player.mask.overlap(land.mask,
-                                               (land.rect.x - player.rect.x, land.rect.y - player.rect.y - 2)) for
-                           land in objects):
-                        up = -GRAVITY * 2.5
-                if event.key == pygame.K_RETURN:
-                    for i in player_objects:
-                        if ((player.rect.x + player.rect.width // 2 + 70 > i.rect.x) and
-                                (player.rect.x + player.rect.width // 2 - 70 < i.rect.x + i.rect.width) and
-                                (player.rect.y + player.rect.height // 2 > i.rect.y) and
-                                (player.rect.y + player.rect.height // 2 < i.rect.y + i.rect.height)):
-                            i.touch()
-                            i.switch(exit_)
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_w or event.key == pygame.K_SPACE:
+                        if any(player.mask.overlap(land.mask,
+                                                   (land.rect.x - player.rect.x, land.rect.y - player.rect.y - 2)) for
+                               land in objects):
+                            up = -GRAVITY * 2.5
+                    if event.key == pygame.K_RETURN:
+                        for i in player_objects:
+                            if ((player.rect.x + player.rect.width // 2 + 70 > i.rect.x) and
+                                    (player.rect.x + player.rect.width // 2 - 70 < i.rect.x + i.rect.width) and
+                                    (player.rect.y + player.rect.height // 2 > i.rect.y) and
+                                    (player.rect.y + player.rect.height // 2 < i.rect.y + i.rect.height)):
+                                i.touch()
+                                i.switch(exit_)
 
-                            break
+                                break
 
-            if event.type == pygame.USEREVENT:
-                if event.user_type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:
-                    pygame.quit()
-                    exit()
+                if event.type == pygame.USEREVENT:
+                    if event.user_type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:
+                        pygame.quit()
+                        exit()
 
-            manager.process_events(event)
-        if collect[pygame.K_a]:
-            left = -7
-        else:
-            left = 0
-        if collect[pygame.K_d]:
-            right = 7
-        else:
-            right = 0
+                manager.process_events(event)
+            if collect[pygame.K_a]:
+                left = -7
+            else:
+                left = 0
+            if collect[pygame.K_d]:
+                right = 7
+            else:
+                right = 0
 
-        update_collision()
+            update_collision()
 
-        object_update()
+            object_update()
 
-        if up < 0:
-            up += 1
-        manager.update(time_delta)
-        all_sprites.draw(main_window)
-        manager.draw_ui(main_window)
-        indic.draw_circles()
-        pygame.display.update()
-        clock.tick(60)
+            if up < 0:
+                up += 1
+            manager.update(time_delta)
+            all_sprites.draw(main_window)
+            manager.draw_ui(main_window)
+            indic.draw_circles()
+            pygame.display.update()
+            clock.tick(60)
+        bg_sound.stop()
+        main_window.fill(pygame.Color('white'))
+        for sprite in all_sprites:
+            all_sprites.remove(sprite)
+        objects.clear()
+        player_objects.clear()
+
+
