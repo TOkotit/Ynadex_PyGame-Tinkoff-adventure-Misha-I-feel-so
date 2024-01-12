@@ -82,7 +82,6 @@ def end_screen():
 
     while run:
         time_delta1 = clock1.tick(60)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
@@ -111,6 +110,7 @@ def end_screen():
 
 def update_collision():
     global left, right, up, flag_gravity, runnning, fon_y, fon_x
+    x_dir = None
     go = left + right
     player.rect.x += go
     if go != 0 and not flag_gravity:
@@ -139,18 +139,22 @@ def update_collision():
                         if isinstance(port, Portal):
                             if object_.who_id == port.my_id:
                                 if port.direction == 'right':
-                                    x_dir = 20
+                                    if player.mask.overlap(object_.mask,(object_.rect.x - player.rect.x - 30,object_.rect.y - player.rect.y)):
+                                        x_dir = 70
                                 else:
-                                    x_dir = -20
-                                x_p, y_p = player.rect.x - port.rect.x + x_dir, player.rect.y - port.rect.y
-                                for obj in objects:
-                                    obj.rect.x = obj.rect.x - x_p
-                                    obj.rect.y = obj.rect.y + y_p
-                                for obj in player_objects:
-                                    obj.rect.x = obj.rect.x - x_p
-                                    obj.rect.y = obj.rect.y + y_p
-                                fon_x, fon_y = fon_x + x_p, fon_y + y_p
-                                break
+                                    if player.mask.overlap(object_.mask,(object_.rect.x - player.rect.x + 30,object_.rect.y - player.rect.y)):
+                                        x_dir = -70
+                                if x_dir:
+                                    x_p, y_p = player.rect.x - port.rect.x + x_dir, player.rect.y - port.rect.y
+                                    for obj in objects:
+                                        obj.rect.x = obj.rect.x - x_p
+                                        obj.rect.y = obj.rect.y + y_p - player.rect.height
+                                    for obj in player_objects:
+                                        obj.rect.x = obj.rect.x - x_p
+                                        obj.rect.y = obj.rect.y + y_p - player.rect.height
+                                    x_p //= 0.85
+                                    fon_x += x_p
+                                    break
     if (((exit_.rect.x + 40 <= player.rect.x <= exit_.rect.x + exit_.rect.width) and (
             exit_.rect.x <= player.rect.x + player.rect.width <= exit_.rect.x + exit_.rect.width - 40))
             and (exit_.rect.y < player.rect.y < exit_.rect.y + exit_.rect.height)):
@@ -201,9 +205,6 @@ def object_update():
 
     if player.rect.y + 1 <= camera_rect.y:
         player.rect.y = camera_rect.y
-        fon_y += 5
-        if fon_y >= 600:
-            fon_y = 0
         for object_ in objects:
             object_.rect.y += 7
         for pl_objrect in player_objects:
@@ -212,9 +213,6 @@ def object_update():
 
     elif player.rect.height + player.rect.y - 1 >= camera_rect.height + camera_rect.y:
         player.rect.y = camera_rect.y + camera_rect.height - player.rect.height
-        fon_y -= 5
-        if fon_y <= -600:
-            fon_y = 0
         for object_ in objects:
             object_.rect.y -= 7
         for pl_objrect in player_objects:
@@ -240,7 +238,7 @@ if __name__ == '__main__':
         indic = Indicator(main_window, exit_)
         background = pygame.transform.smoothscale(load_image(f'fons/{level_fon}'), (wight, height))
         background2 = pygame.transform.smoothscale(load_image(f'fons/{level_sky}'), (5000, 3000))
-        fon_x, fon_y = 0, -30
+        fon_x, fon_y = 0, 0
         bg_sound = pygame.mixer.Sound(f'../assets/sounds/fon_music/{music}')
         bg_sound.set_volume(0.1)
         bg_sound.play()
