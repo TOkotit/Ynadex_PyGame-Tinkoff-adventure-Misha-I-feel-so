@@ -126,6 +126,8 @@ class Portal(pygame.sprite.Sprite):
         super().__init__(all_sprites)
         self.my_id = my_id
         self.who_id = who_id
+        self.sound_ = pygame.mixer.Sound('../assets/sounds/portal.mp3')
+        self.sound_.set_volume(0.05)
         self.direction = direction
         self.rect = pygame.Rect(x1, y1, 64, 128)
         self.image = pygame.transform.smoothscale(load_image(f'objects/{image}'), self.rect.size)
