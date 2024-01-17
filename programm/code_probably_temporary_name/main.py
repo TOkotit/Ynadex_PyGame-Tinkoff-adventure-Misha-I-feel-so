@@ -47,7 +47,8 @@ def update_collision():
                                     if player.mask.overlap(object_.mask,(object_.rect.x - player.rect.x + 30,object_.rect.y - player.rect.y)):
                                         x_dir = -70
                                 if x_dir:
-                                    x_p, y_p = player.rect.x - port.rect.x + x_dir, player.rect.y - port.rect.y
+                                    x_p, y_p = (port.rect.x - player.rect.x + x_dir, player.rect.y - port.rect.y)
+
                                     for obj in objects:
                                         obj.rect.x = obj.rect.x - x_p
                                         obj.rect.y = obj.rect.y + y_p - player.rect.height
@@ -138,15 +139,15 @@ if __name__ == '__main__':
 
     flag_gravity = True
     manager = pygame_gui.UIManager(size)
-    for level in range(1, 3):
+    for level in range(2, 3):
         player, level_fon, level_sky, objects, player_objects, music, exit_ = parse_level(f'{level}_level')
         indic = Indicator(main_window, exit_)
         background = pygame.transform.smoothscale(load_image(f'fons/{level_fon}'), (wight, height))
         background2 = pygame.transform.smoothscale(load_image(f'fons/{level_sky}'), (5000, 3000))
         fon_x, fon_y = 0, 0
-        bg_sound = pygame.mixer.Sound(f'../assets/sounds/fon_music/{music}')
-        bg_sound.set_volume(0.1)
-        bg_sound.play()
+        pygame.mixer.music.load(f'../assets/sounds/fon_music/{music}')
+        pygame.mixer.music.set_volume(0.1)
+        pygame.mixer.music.play()
         camera_rect = pygame.Rect((300 - 75, 300 - 40), (150, 80))
         runnning = True
         up = 0
@@ -211,7 +212,6 @@ if __name__ == '__main__':
             indic.draw_circles()
             pygame.display.update()
             clock.tick(60)
-        bg_sound.stop()
         main_window.fill(pygame.Color('white'))
         for sprite in all_sprites:
             all_sprites.remove(sprite)
