@@ -1,6 +1,9 @@
+import os
+
 import pygame
 import pygame_gui
 import sys
+from random import choice, randrange
 from screens import end_screen, start_screen
 from classes_modules import *
 from level_parser import parse_level, portals
@@ -8,10 +11,8 @@ from level_parser import parse_level, portals
 GRAVITY = 15
 
 
-
-
 def update_collision():
-    global left, right, up, flag_gravity, runnning, fon_y, fon_x
+    global left, right, up, flag_gravity, running, fon_y, fon_x
     x_dir = None
     go = left + right
     player.rect.x += go
@@ -41,10 +42,12 @@ def update_collision():
                         if isinstance(port, Portal):
                             if object_.who_id == port.my_id:
                                 if port.direction == 'right':
-                                    if player.mask.overlap(object_.mask,(object_.rect.x - player.rect.x - 30,object_.rect.y - player.rect.y)):
+                                    if player.mask.overlap(object_.mask, (
+                                    object_.rect.x - player.rect.x - 30, object_.rect.y - player.rect.y)):
                                         x_dir = 70
                                 else:
-                                    if player.mask.overlap(object_.mask,(object_.rect.x - player.rect.x + 30,object_.rect.y - player.rect.y)):
+                                    if player.mask.overlap(object_.mask, (
+                                    object_.rect.x - player.rect.x + 30, object_.rect.y - player.rect.y)):
                                         x_dir = -70
                                 if x_dir:
                                     x_p, y_p = (port.rect.x - player.rect.x + x_dir, player.rect.y - port.rect.y)
@@ -61,11 +64,13 @@ def update_collision():
                                     fon_x += x_p
                                     port.sound_.play()
                                     break
-    if (((exit_.rect.x + 40 <= player.rect.x <= exit_.rect.x + exit_.rect.width) and (
-            exit_.rect.x <= player.rect.x + player.rect.width <= exit_.rect.x + exit_.rect.width - 40))
+    if (((exit_.rect.x + 25 <= player.rect.x <= exit_.rect.x + exit_.rect.width) and (
+            exit_.rect.x <= player.rect.x + player.rect.width <= exit_.rect.x + exit_.rect.width - 25))
             and (exit_.rect.y < player.rect.y < exit_.rect.y + exit_.rect.height)):
         if all(exit_.conditions):
-            runnning = False
+            running = False
+        else:
+            print(exit_.conditions)
     player.rect.y += up
     if objects:
         for object_ in objects:
@@ -133,25 +138,27 @@ if __name__ == '__main__':
     pygame.display.set_caption('Game')
     size = wight, height = 600, 600
     main_window = pygame.display.set_mode(size)
-
+    load_screen = pygame.transform.smoothscale(load_image('fons/load_screen.png'), (600, 600))
+    oleg = pygame.mixer.Sound('../assets/sounds/lever_sound.mp3')
     clock_delta = pygame.time.Clock()
     clock = pygame.time.Clock()
 
     flag_gravity = True
     manager = pygame_gui.UIManager(size)
-    for level in range(2, 3):
+    for level in range(1, 4):
         player, level_fon, level_sky, objects, player_objects, music, exit_ = parse_level(f'{level}_level')
         indic = Indicator(main_window, exit_)
         background = pygame.transform.smoothscale(load_image(f'fons/{level_fon}'), (wight, height))
         background2 = pygame.transform.smoothscale(load_image(f'fons/{level_sky}'), (5000, 3000))
+
         fon_x, fon_y = 0, 0
         pygame.mixer.music.load(f'../assets/sounds/fon_music/{music}')
         pygame.mixer.music.set_volume(0.1)
         pygame.mixer.music.play()
         camera_rect = pygame.Rect((300 - 75, 300 - 40), (150, 80))
-        runnning = True
+        running = True
         up = 0
-        while runnning:
+        while running:
             main_window.blit(background, (fon_x, fon_y))
             main_window.blit(background, (fon_x + 600, fon_y))
             main_window.blit(background, (fon_x - 600, fon_y))
@@ -183,7 +190,11 @@ if __name__ == '__main__':
                                     (player.rect.y + player.rect.height // 2 < i.rect.y + i.rect.height)):
                                 i.touch()
                                 i.switch(exit_)
-
+                                if not all(exit_.conditions):
+                                    if randrange(10) == 4:
+                                        oleg.stop()
+                                        oleg = pygame.mixer.Sound(f"../assets/sounds/oleg_speak/{choice(os.listdir('../assets/sounds/oleg_speak'))}")
+                                        oleg.play()
                                 break
 
                 if event.type == pygame.USEREVENT:
@@ -203,18 +214,21 @@ if __name__ == '__main__':
             update_collision()
 
             object_update()
-
             if up < 0:
                 up += 1
             manager.update(time_delta)
             all_sprites.draw(main_window)
             manager.draw_ui(main_window)
             indic.draw_circles()
+
             pygame.display.update()
             clock.tick(60)
-        main_window.fill(pygame.Color('white'))
+        pygame.mixer.music.stop()
+        main_window.blit(load_screen, (0, 0))
+        pygame.display.update()
         for sprite in all_sprites:
             all_sprites.remove(sprite)
         objects.clear()
         player_objects.clear()
+
     end_screen()

@@ -13,31 +13,33 @@ def parse_level(filename: str):
     player_objeccts = []
     with open(path, encoding='utf-8') as f:
         for line in f.readlines():
-            if line[0] == '#':
-                level_fon = ' '.join(line.strip().split()[1:])
-            elif line[0] == 'S':
-                level_sky = ' '.join(line.strip().split()[1:])
-            elif line[0] == 'M':
-                bg_music = ' '.join(line.strip().split()[1:])
-            elif line[0] == 'P':
-                line = line.strip().split()
-                x, y, direction, id1, id2, image = int(line[1]), int(line[2]), line[3], int(line[4]), int(line[5]), line[-1]
-                portals[id1] = id2
-                level_objects.append(Portal(image, direction, id1, id2, x, y))
+            match line[0]:
+                case '#':
+                    level_fon = ' '.join(line.strip().split()[1:])
+                case 'S':
+                    level_sky = ' '.join(line.strip().split()[1:])
+                case 'M':
+                    bg_music = ' '.join(line.strip().split()[1:])
+                case 'P':
+                    line = line.strip().split()
+                    x, y, direction, id1, id2, image = int(line[1]), int(line[2]), line[3], int(line[4]), int(line[5]), line[-1]
+                    portals[id1] = id2
+                    level_objects.append(Portal(image, direction, id1, id2, x, y))
 
-            else:
-                line = line.strip().split()
-                type, data, image = line[0], [int(i) for i in line[1:-1]], line[-1]
-                if type == '.':
-                    player = Player(image, *data)
-                elif type == '_':
-                    level_objects.append(Land(image, *data))
-                elif type == '|':
-                    level_objects.append(Wall(image, *data))
-                elif type == '/':
-                    player_objeccts.append(Lever(image, *data))
-                elif type == 'E':
-                    ex = Exit(image, *data)
+                case _:
+                    line = line.strip().split()
+                    type, data, image = line[0], [int(i) for i in line[1:-1]], line[-1]
+                    match type:
+                        case '.':
+                            player = Player(image, *data)
+                        case '_':
+                            level_objects.append(Land(image, *data))
+                        case '|':
+                            level_objects.append(Wall(image, *data))
+                        case '/':
+                            player_objeccts.append(Lever(image, *data))
+                        case 'E':
+                            ex = Exit(image, *data)
 
     if player is None:
         raise Exception('не нашел игрока на уровне')

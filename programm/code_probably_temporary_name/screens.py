@@ -19,6 +19,11 @@ def start_screen():
         text='Start',
         manager=manager
     )
+    exit_button = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect((100, 500), (100, 50)),
+        text='Exit',
+        manager=manager
+    )
     clock1 = pygame.time.Clock()
 
     while run:
@@ -40,6 +45,8 @@ def start_screen():
                     if event.ui_element == start_button:
                         start_button.hide()
                         return 0
+                    if event.ui_element == exit_button:
+                        pygame.quit()
             manager.process_events(event)
         manager.update(time_delta1)
         menu_surface.blit(fon, (0, 0))
