@@ -1,12 +1,11 @@
 import os
-
 import pygame
 import pygame_gui
 import sys
 from random import choice, randrange
 from screens import end_screen, start_screen
 from classes_modules import *
-from level_parser import parse_level, portals
+from level_parser import parse_level
 
 GRAVITY = 15
 
@@ -145,7 +144,7 @@ if __name__ == '__main__':
 
     flag_gravity = True
     manager = pygame_gui.UIManager(size)
-    for level in range(1, 4):
+    for level in range(1, len(os.listdir('../assets/levels')) + 1):
         player, level_fon, level_sky, objects, player_objects, music, exit_ = parse_level(f'{level}_level')
         indic = Indicator(main_window, exit_)
         background = pygame.transform.smoothscale(load_image(f'fons/{level_fon}'), (wight, height))
