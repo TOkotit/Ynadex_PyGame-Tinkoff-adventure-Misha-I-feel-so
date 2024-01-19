@@ -1,6 +1,7 @@
 M Hardcore Dance.mp3
 # 3_level_fon.jpg
 S 3_level_sky_fon.png
+E 5000 -480 120 160 0 test_exit.png
 . 0 560 tinkoff_idle.png
 _ -100 560 1120 500 plastic_ocean.jpg
 _ 1020 560 1000 500 plastic_ocean.jpg
@@ -40,4 +41,3 @@ P 3286 162 left 3 4 portal_red.png
 P 3286 -728 left 4 3 portal_red.png
 P 3836 -1128 left 5 6 portal_blue.png
 P 3450 162 right 6 5 portal_blue.png
-E 5000 -480 120 160 0 test_exit.png

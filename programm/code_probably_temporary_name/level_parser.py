@@ -6,7 +6,7 @@ from classes_modules import *
 portals = {}
 
 def parse_level(filename: str):
-    path = Path(__file__).parent.parent / 'assets' / 'levels' / f'{filename}.txt'
+    path = Path.cwd().parent / 'assets' / 'levels' / f'{filename}.txt'
 
     player = None
     level_objects = []

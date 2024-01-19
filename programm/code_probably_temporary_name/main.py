@@ -197,7 +197,7 @@ if __name__ == '__main__':
                 if event.type == pygame.USEREVENT:
                     if event.user_type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:
                         pygame.quit()
-                        exit()
+                        sys.exit()
                 manager.process_events(event)
             if collect[pygame.K_a]:
                 left = -7
