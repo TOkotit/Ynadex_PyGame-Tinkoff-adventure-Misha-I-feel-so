@@ -13,7 +13,8 @@ def parse_level(filename: str): # выгружаем txt файл
     player_objeccts = []
     with open(path, encoding='utf-8') as f: # открываем
         for line in f.readlines():
-            match line[0]: # в зависимости от ключа определяем объект
+            # в зависимости от ключа определяем объект
+            match line[0]:
                 case '#':
                     level_fon = ' '.join(line.strip().split()[1:])
                 case 'S':
@@ -26,8 +27,8 @@ def parse_level(filename: str): # выгружаем txt файл
                     portals[id1] = id2
                     level_objects.append(Portal(image, direction, id1, id2, x, y))
 
-                case _: # для разных классов свои параметры
-                    line = line.strip().split()
+                case _:
+                    line = line.strip().split() # для разных классов свои параметры
                     type, data, image = line[0], [int(i) for i in line[1:-1]], line[-1]
                     match type:
                         case '.':

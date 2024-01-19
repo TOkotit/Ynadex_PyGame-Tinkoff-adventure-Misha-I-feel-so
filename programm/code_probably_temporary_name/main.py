@@ -145,7 +145,7 @@ if __name__ == '__main__':
         player, level_fon, level_sky, objects, player_objects, music, exit_ = parse_level(f'{level}_level') # из функции отбираем все объеты
         indic = Indicator(main_window, exit_) # рисуем кружочки в зависимости от кол-ва условий
         background = pygame.transform.smoothscale(load_image(f'fons/{level_fon}'), (wight, height)) # растягиваем задник
-        background2 = pygame.transform.smoothscale(load_image(f'fons/{level_sky}'), (5000, 3000))
+        bg_2 = pygame.transform.smoothscale(load_image(f'fons/{level_sky}'), (5000, 3000))
 
         fon_x, fon_y = 0, 0 # координаты фона
         pygame.mixer.music.load(f'../assets/sounds/fon_music/{music}') # загружаем и запускаем музыку с уровня
@@ -155,10 +155,11 @@ if __name__ == '__main__':
         running = True
         up = 0
         while running:
-            main_window.blit(background, (fon_x, fon_y)) # запихиваем задник
+            # запихиваем задник
+            main_window.blit(background, (fon_x, fon_y))
             main_window.blit(background, (fon_x + 600, fon_y))
             main_window.blit(background, (fon_x - 600, fon_y))
-            main_window.blit(background2, (-2500, fon_y - 300))
+            main_window.blit(bg_2, (-2500, fon_y - 3000))
             collect = pygame.key.get_pressed() # смотрим на нажатые клавиши
             time_delta = clock_delta.tick(60) / 1000
             for event in pygame.event.get(): # если игрок нажал Х, аккуратно спрашиваем, точно ли он выйти хотел
