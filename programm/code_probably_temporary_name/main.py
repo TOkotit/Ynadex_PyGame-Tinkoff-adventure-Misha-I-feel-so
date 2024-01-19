@@ -68,8 +68,6 @@ def update_collision():
             and (exit_.rect.y < player.rect.y < exit_.rect.y + exit_.rect.height)):
         if all(exit_.conditions):
             running = False
-        else:
-            print(exit_.conditions)
     player.rect.y += up
     if objects:
         for object_ in objects:
@@ -190,7 +188,7 @@ if __name__ == '__main__':
                                 i.touch()
                                 i.switch(exit_)
                                 if not all(exit_.conditions):
-                                    if randrange(10) == 4:
+                                    if randrange(12) == 4:
                                         oleg.stop()
                                         oleg = pygame.mixer.Sound(f"../assets/sounds/oleg_speak/{choice(os.listdir('../assets/sounds/oleg_speak'))}")
                                         oleg.play()
