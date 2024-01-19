@@ -1,19 +1,19 @@
-from pathlib import Path
-from classes_modules import *
+from pathlib import Path # велика компания
+from classes_modules import * # загружаем все наши классы
 
+# тут вобщем загружаются уровни
 
+portals = {} #список порталов
 
-portals = {}
-
-def parse_level(filename: str):
+def parse_level(filename: str): # выгружаем txt файл
     path = Path.cwd().parent / 'assets' / 'levels' / f'{filename}.txt'
 
     player = None
     level_objects = []
     player_objeccts = []
-    with open(path, encoding='utf-8') as f:
+    with open(path, encoding='utf-8') as f: # открываем
         for line in f.readlines():
-            match line[0]:
+            match line[0]: # в зависимости от ключа определяем объект
                 case '#':
                     level_fon = ' '.join(line.strip().split()[1:])
                 case 'S':
@@ -26,7 +26,7 @@ def parse_level(filename: str):
                     portals[id1] = id2
                     level_objects.append(Portal(image, direction, id1, id2, x, y))
 
-                case _:
+                case _: # для разных классов свои параметры
                     line = line.strip().split()
                     type, data, image = line[0], [int(i) for i in line[1:-1]], line[-1]
                     match type:
@@ -41,7 +41,7 @@ def parse_level(filename: str):
                         case 'E':
                             ex = Exit(image, *data)
 
-    if player is None:
+    if player is None: # ну он должен быть
         raise Exception('не нашел игрока на уровне')
 
-    return player, level_fon, level_sky, level_objects, player_objeccts, bg_music, ex
+    return player, level_fon, level_sky, level_objects, player_objeccts, bg_music, ex # возвращаем что там в файле было написано
