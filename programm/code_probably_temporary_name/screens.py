@@ -4,7 +4,8 @@ import pygame
 import pygame_gui
 from level_parser import load_image
 
-def start_screen(): # экран старта с кнопочками, я писал с видеоуроков яндекса, сам не особо что помню куда и как
+
+def start_screen():  # экран старта с кнопочками, я писал с видеоуроков яндекса, сам не особо что помню куда и как
     try:
         pygame.display.set_caption('Start menu')
         size = wight, height = 800, 600
@@ -17,14 +18,14 @@ def start_screen(): # экран старта с кнопочками, я пис
         fon = pygame.transform.scale(load_image('fons/menu_fon.jpg'), (wight, height))
         menu_surface.blit(fon, (0, 0))
         run = True
-        start_button = pygame_gui.elements.UIButton( # кнопка старта
+        start_button = pygame_gui.elements.UIButton(  # кнопка старта
             relative_rect=pygame.Rect((100, 400), (100, 50)),
             text='Start',
             manager=manager
         )
         exit_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((100, 500), (100, 50)),
-            text='Exit', # кнопка выхода
+            text='Exit',  # кнопка выхода
             manager=manager
         )
         clock1 = pygame.time.Clock()
@@ -35,13 +36,13 @@ def start_screen(): # экран старта с кнопочками, я пис
                 if event.type == pygame.QUIT:
                     pygame_gui.windows.UIConfirmationDialog(
                         rect=pygame.Rect((300, 200), (300, 200)),
-                        manager=manager,# диалоговое окно
+                        manager=manager,  # диалоговое окно
                         window_title='Ало?',
                         action_long_desc='Куда собрался?',
                         action_short_name='Ок',
                         blocking=True
                     )
-                if event.type == pygame.USEREVENT: # если почалось
+                if event.type == pygame.USEREVENT:  # если почалось
                     if event.user_type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:
                         pygame.quit()
                     if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
@@ -69,7 +70,7 @@ def start_screen(): # экран старта с кнопочками, я пис
         sys.exit()
 
 
-def end_screen(): # абсолютно то же самое, но буковки другие
+def end_screen():  # абсолютно то же самое, но буковки другие
     pygame.display.set_caption('Start menu')
     size = wight, height = 800, 600
     menu_surface = pygame.display.set_mode(size)
