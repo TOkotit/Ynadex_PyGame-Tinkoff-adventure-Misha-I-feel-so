@@ -3,6 +3,6 @@ M Demencia_ost.mp3
 S 3_level_sky_fon.png
 E 5000 -480 120 160 0 test_exit.png
 . 0 560 2007_is_coming.jpg
-_ -300 560 900 200 demecia_pol.png
+_ -1000 560 2000 400 demecia_pol.png
 | -300 0 200 560 demecia_pol.png
 | 400 0 200 560 demecia_pol.png
